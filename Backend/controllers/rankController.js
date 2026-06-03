@@ -1,65 +1,78 @@
 import KeywordTracking from "../models/keywordTracking";
+import { keywordTracking } from "../services/keywordTrackingService";
 
 
 //Add a keyword to track
-export const addKeyword = async (req,res) => {
+export const addKeyword = async (req, res) => {
     try {
-        const {keyword,url} = req.body;
-        
-        if(!keyword || !url) return res.status(400).json({success:false,message:"Keyword and URL are required"});
+        const { keyword, url } = req.body;
+
+        if (!keyword || !url) return res.status(400).json({ success: false, message: "Keyword and URL are required" });
 
         //Extract domain from url
         let domain;
         try {
-            const urlObj = new URL(url.startswith("http")? url : `https://${url}`)
-            domain = urlObj.hostname.replace("www.","")
+            const urlObj = new URL(url.startsWith("http") ? url : `https://${url}`)
+            domain = urlObj.hostname.replace("www.", "")
         } catch (error) {
-            return res.status(400).json({success:false,message:"Invalid URL format"})
+            return res.status(400).json({ success: false, message: "Invalid URL format" })
         }
 
         //check if already tracking this keyword+domain
-        const existing = await KeywordTracking.findOne({userId:req.userId,keyword:keyword.toLowerCase().trim(),domain})
+        const existing = await KeywordTracking.findOne({ userId: req.userId, keyword: keyword.toLowerCase().trim(), domain })
 
-        if(existing){
-            return res.status(400).json({success:false,message:"Already tracking this keyword for this domain"})
+        if (existing) {
+            return res.status(400).json({ success: false, message: "Already tracking this keyword for this domain" })
         }
 
         //Create tracking history
         const tracking = await KeywordTracking.create({
-            userId:req.userId,
-            keyword:keyword.toLowerCase().trim(),
-            url:url.startswith("http") ? url : `https://${url}`,
+            userId: req.userId,
+            keyword: keyword.toLowerCase().trim(),
+            url: url.startsWith("http") ? url : `https://${url}`,
             domain,
-            status:"checking" 
+            status: "checking"
         })
-        res.status(201).json({success:true,message:"Keyword tracking started",tracking})
+        res.status(201).json({ success: true, message: "Keyword tracking started", tracking })
+        keywordTracking(tracking)
 
     } catch (error) {
-        
+        console.error("Add keyword error:", error.message);
+        if (error.code === 11000) return res.status(400).json({ success: false, message: "Already tracking this keyword" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 }
 
 //Get all tracked keywords for user
-export const getKeywords = async (req,res) => {
-    
+export const getKeywords = async (req, res) => {
+
+    try {
+        const keywords = await keywordTracking.find({ userId: req.userId })
+            .sort({ createdAt: -1 })
+            .select("-rankHistory");
+        res.json({ success: true, keywords });
+    } catch (error) {
+        console.error("Get keywords error:", error.message);
+        res.status(500).json({ success: false, message: "Server error" });
+    }
 }
 
 //Get single keyword with full history 
-export const getKeyword = async (req,res) => {
-    
+export const getKeyword = async (req, res) => {
+
 }
 
 //Manually refresh a keyword ranking
-export const refreshKeyword = async (req,res) => {
-    
+export const refreshKeyword = async (req, res) => {
+
 }
 
 //Delete keyword tracking
-export const deleteKeyword = async (req,res) => {
-    
+export const deleteKeyword = async (req, res) => {
+
 }
 
 //Toggle Tracking active/inactive
-export const toggleTracking = async (req,res) => {
-    
+export const toggleTracking = async (req, res) => {
+
 }
