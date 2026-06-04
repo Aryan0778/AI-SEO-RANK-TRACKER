@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { useId } from "react";
 
 const rankEntrySchema = new mongoose.Schema({
     date: { type: Date, required: true },
@@ -33,7 +32,7 @@ const keywordTrackingSchema = new mongoose.Schema({
     status: { type: String, enum: ["pending", "checking", "completed", "failed"], default: "pending" },
 }, {timestamps: true})
 
-keywordTrackingSchema.index({useId: 1,keyword: 1,domain: 1}, {unique: true})
+keywordTrackingSchema.index({userId: 1,keyword: 1,domain: 1}, {unique: true})
 
 const KeywordTracking =  mongoose.model("KeywordTracking",keywordTrackingSchema)
 
