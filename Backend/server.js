@@ -13,27 +13,8 @@ dns.setServers(["1.1.1.1", "8.8.8.8"]);
 connectDB()
 const app = express()
 
-const allowedOrigins = [
-    'https://ai-seo-rank-tracker-yio4.vercel.app', // Your Vercel frontend domain
-    'http://localhost:5173'                        // Your local development domain
-];
-
-app.use(cors({
-    origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, curl, or Postman)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Blocked by CORS policy'));
-        }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors())
 app.use(express.json())
-
 
 app.get('/',(req,res)=>res.send("Server is running"))
 app.use("/api/auth", authRouter)
