@@ -59,6 +59,8 @@ export const analyzeUrl = async (req, res) => {
             analysis.wordCount = scrapeResult.data.wordCount || 0;
             analysis.status = "completed";
 
+            await analysis.save();
+
         } catch (bgError) {
             console.error("Background analysis error:", bgError.message);
             try {
