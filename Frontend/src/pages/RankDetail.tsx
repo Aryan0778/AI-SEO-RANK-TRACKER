@@ -51,11 +51,13 @@ export default function RankDetail() {
         try {
             const res = await api.get(`/api/rank/${id}`);
             if (res.data.success) {
-                setTimeout(fetchTracking, 3000)
+                if (res.data.tracking.status === "checking") {
+                    setTimeout(fetchTracking, 3000)
+                    setTracking(res.data.tracking)
+                    return;
+                }
                 setTracking(res.data.tracking)
-                return;
-            }
-            setTracking(res.data.tracking)
+            }     
         } catch {
             // handled by null state
         }
@@ -81,7 +83,7 @@ export default function RankDetail() {
                     console.error(error)
                 }
             }, 3000)
-        } catch  {
+        } catch {
             setRefreshing(false)
         }
     };
