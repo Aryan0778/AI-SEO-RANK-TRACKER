@@ -3,7 +3,7 @@ import cors from 'cors'
 import 'dotenv/config'
 import connectDB from './config/db.js'
 import dns from 'dns';
-import authRouter from './Routes/authRoutes.js';
+import authRouter from './routes/authRoutes.js';
 import rankRouter from './routes/rankRoutes.js';
 import analysisRouter from './routes/analysisRoutes.js';
 import { startRankTrackingCron } from './cron/rankTrackingCron.js';
